@@ -8,15 +8,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#CCFF00',
-        secondary: '#E8EDE8',
-        tertiary: '#7D8A7D',
-        neutral: '#080C08',
-        surface: '#101410',
-        'on-surface': '#E8EDE8',
-        error: '#FF6B6B',
-        border: '#374151',
-        muted: '#5F6A5F',
+        primary: '#000000',
+        secondary: '#FFFFFF',
+        tertiary: '#808080',
+        neutral: '#000000',
+        surface: '#FFFFFF',
+        'on-surface': '#000000',
+        error: '#000000',
+        border: '#000000',
+        muted: '#808080',
       },
       fontFamily: {
         display: ['Playfair Display', 'serif'],

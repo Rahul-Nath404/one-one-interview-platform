@@ -32,27 +32,20 @@ export default function LoginPage() {
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-[#030712] text-slate-100 font-sans antialiased relative overflow-hidden px-4 selection:bg-blue-600/30 selection:text-blue-200">
-			{/* Ambient background glows */}
-			<div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
-			<div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[140px] pointer-events-none" />
-
-			<Card className="w-full max-w-md bg-slate-950/45 border border-slate-900 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden relative z-10">
+		<div className="min-h-screen flex items-center justify-center bg-white text-black font-sans antialiased px-4">
+			<Card className="w-full max-w-md bg-white border border-black shadow-lg rounded-lg">
 				<CardContent className="p-8 space-y-6">
-					<div className="text-center space-y-1.5">
-						<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 font-extrabold text-white shadow-lg shadow-blue-500/20 text-base mx-auto mb-3">
-							OS
-						</div>
-						<h2 className="text-xl font-bold text-white tracking-tight">Welcome Back</h2>
-						<p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+					<div className="text-center space-y-2">
+						<h2 className="text-2xl font-bold text-black">InterviewOS</h2>
+						<p className="text-sm text-gray-700">
 							Log in to access your interview dashboard
 						</p>
 					</div>
 
 					<form onSubmit={handleSubmit} className="space-y-4">
 						{/* Email */}
-						<div className="space-y-1.5">
-							<label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
+						<div className="space-y-2">
+							<label className="text-sm font-bold text-black block">
 								Email Address
 							</label>
 							<Input
@@ -62,13 +55,13 @@ export default function LoginPage() {
 								onChange={(e) => setEmail(e.target.value)}
 								required
 								disabled={isLoading}
-								className="text-xs bg-slate-900/60 border border-slate-800 focus:border-blue-500/70 hover:border-slate-750/80 rounded-xl px-3.5 py-2 transition-all focus:outline-none text-slate-200 font-medium placeholder:text-slate-650"
+								className="text-sm bg-white border border-black focus:border-black rounded-lg px-4 py-2 transition-all focus:outline-none text-black"
 							/>
 						</div>
 
 						{/* Password */}
-						<div className="space-y-1.5">
-							<label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
+						<div className="space-y-2">
+							<label className="text-sm font-bold text-black block">
 								Password
 							</label>
 							<Input
@@ -78,22 +71,22 @@ export default function LoginPage() {
 								onChange={(e) => setPassword(e.target.value)}
 								required
 								disabled={isLoading}
-								className="text-xs bg-slate-900/60 border border-slate-800 focus:border-blue-500/70 hover:border-slate-750/80 rounded-xl px-3.5 py-2 transition-all focus:outline-none text-slate-200 font-medium placeholder:text-slate-650"
+								className="text-sm bg-white border border-black focus:border-black rounded-lg px-4 py-2 transition-all focus:outline-none text-black"
 							/>
 						</div>
 
 						<Button
 							type="submit"
 							disabled={isLoading}
-							className="w-full bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-full h-10 text-xs shadow-lg shadow-blue-500/10 transition-colors mt-2"
+							className="w-full bg-black text-white font-bold rounded-lg h-10 text-sm transition-colors mt-4"
 						>
 							{isLoading ? 'Logging in...' : 'Sign In'}
 						</Button>
 					</form>
 
-					<div className="text-center text-xs text-slate-500 pt-2 border-t border-slate-900/65">
-						Don't have a recruiter account?{' '}
-						<Link href="/signup" className="text-blue-500 hover:text-blue-400 font-bold transition-colors">
+					<div className="text-center text-sm text-gray-700 pt-2 border-t border-black">
+						Don't have an account?{' '}
+						<Link href="/signup" className="text-black font-bold hover:underline transition-colors">
 							Sign up
 						</Link>
 					</div>

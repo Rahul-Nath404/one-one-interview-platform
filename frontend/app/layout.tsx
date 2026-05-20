@@ -26,6 +26,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>InterviewOS</title>
         <meta name="description" content="Browser-based interview platform" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
