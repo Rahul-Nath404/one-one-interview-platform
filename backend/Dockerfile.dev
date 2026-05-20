@@ -1,0 +1,23 @@
+FROM golang:1.21-alpine
+
+# Install build dependencies
+RUN apk --no-cache add gcc musl-dev
+
+WORKDIR /app
+
+# Copy go mod files first for layer caching
+COPY go.mod ./
+
+# Allow go to update go.sum on download
+ENV GOFLAGS="-mod=mod"
+ENV GONOSUMCHECK="*"
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+EXPOSE 8080
+
+CMD ["go", "run", "main.go"]
