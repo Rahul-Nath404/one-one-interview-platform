@@ -5,9 +5,10 @@ import (
 	"log"
 	"sync"
 
-	"github.com/gofiber/websocket/v2"
 	"interviewos/internal/db"
 	"interviewos/internal/models"
+
+	"github.com/gofiber/websocket/v2"
 )
 
 // Client represents a connected user in a room
@@ -35,16 +36,21 @@ var RoomHub = &Hub{
 
 // WebSocketMessage defines the standard JSON payload structure
 type WebSocketMessage struct {
-	Type     string      `json:"type"`
-	RoomID   string      `json:"roomId,omitempty"`
-	UserID   string      `json:"userId,omitempty"`
-	Name     string      `json:"name,omitempty"`
-	TargetID string      `json:"targetId,omitempty"`
-	SenderID string      `json:"senderId,omitempty"`
-	Signal   interface{} `json:"signal,omitempty"`
-	Message  string      `json:"message,omitempty"`
-	Code     string      `json:"code,omitempty"`
-	Language string      `json:"language,omitempty"`
+	Type       string      `json:"type"`
+	RoomID     string      `json:"roomId,omitempty"`
+	UserID     string      `json:"userId,omitempty"`
+	Name       string      `json:"name,omitempty"`
+	TargetID   string      `json:"targetId,omitempty"`
+	SenderID   string      `json:"senderId,omitempty"`
+	SenderName string      `json:"senderName,omitempty"`
+	Offer      interface{} `json:"offer,omitempty"`
+	Answer     interface{} `json:"answer,omitempty"`
+	Candidate  interface{} `json:"candidate,omitempty"`
+	Message    string      `json:"message,omitempty"`
+	Text       string      `json:"text,omitempty"`
+	Code       string      `json:"code,omitempty"`
+	Language   string      `json:"language,omitempty"`
+	Users      interface{} `json:"users,omitempty"`
 }
 
 // WebSocketHandler manages WebSocket lifecycles
@@ -80,7 +86,7 @@ func WebSocketHandler(c *websocket.Conn) {
 	var codeSession models.CodeSession
 	if err := db.DB.Where("interview_id = ?", roomId).Order("updated_at desc").First(&codeSession).Error; err == nil {
 		initialCodeMsg := WebSocketMessage{
-			Type:     "code:update",
+			Type:     "code-sync",
 			Code:     codeSession.Code,
 			Language: codeSession.Language,
 		}
@@ -105,35 +111,42 @@ func WebSocketHandler(c *websocket.Conn) {
 
 		// Fill in sender info
 		msg.SenderID = userId
+		msg.SenderName = userName
 
 		switch msg.Type {
-		case "signal":
+		case "webrtc-offer", "webrtc-answer", "webrtc-ice":
 			// Forward signaling payload directly to the target peer
 			RoomHub.ForwardMessage(roomId, msg.TargetID, msg)
 
-		case "chat":
+		case "chat-sync":
 			// Broadcast chat message to all peers in the room
 			RoomHub.BroadcastMessage(roomId, msg)
 
-		case "code:update":
+		case "code-sync":
 			// Persist code session
-			go func(rId, code, lang string) {
-				var session models.CodeSession
-				if err := db.DB.Where("interview_id = ?", rId).First(&session).Error; err != nil {
-					// Create new
-					session = models.CodeSession{
-						InterviewID: rId,
-						Code:        code,
-						Language:    lang,
+			if msg.Code != "" || msg.Language != "" {
+				go func(rId, code, lang string) {
+					var session models.CodeSession
+					if err := db.DB.Where("interview_id = ?", rId).First(&session).Error; err != nil {
+						// Create new
+						session = models.CodeSession{
+							InterviewID: rId,
+							Code:        code,
+							Language:    lang,
+						}
+						db.DB.Create(&session)
+					} else {
+						// Update existing
+						if code != "" {
+							session.Code = code
+						}
+						if lang != "" {
+							session.Language = lang
+						}
+						db.DB.Save(&session)
 					}
-					db.DB.Create(&session)
-				} else {
-					// Update existing
-					session.Code = code
-					session.Language = lang
-					db.DB.Save(&session)
-				}
-			}(roomId, msg.Code, msg.Language)
+				}(roomId, msg.Code, msg.Language)
+			}
 
 			// Broadcast updated code to other peers in the room
 			RoomHub.BroadcastMessageExcept(roomId, userId, msg)
@@ -156,27 +169,26 @@ func (h *Hub) RegisterClient(roomId string, client *Client) {
 	room.Mutex.Lock()
 	// Notify other peers about the new client before adding it
 	joinNotify := WebSocketMessage{
-		Type:     "peer:joined",
-		SenderID: client.UserID,
-		Name:     client.Name,
+		Type:       "peer-joined",
+		SenderID:   client.UserID,
+		SenderName: client.Name,
+		Name:       client.Name,
 	}
 	notifyBytes, _ := json.Marshal(joinNotify)
 
 	// Also list current peers in room to the joining client so they can initiate WebRTC peers
-	var currentPeers []struct {
+	type Peer struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	}
+	var currentPeers []Peer
 
 	for _, existingClient := range room.Clients {
 		// Notify existing
 		existingClient.Conn.WriteMessage(websocket.TextMessage, notifyBytes)
 
 		// Collect peer
-		currentPeers = append(currentPeers, struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-		}{ID: existingClient.UserID, Name: existingClient.Name})
+		currentPeers = append(currentPeers, Peer{ID: existingClient.UserID, Name: existingClient.Name})
 	}
 
 	// Add new client
@@ -184,15 +196,9 @@ func (h *Hub) RegisterClient(roomId string, client *Client) {
 	room.Mutex.Unlock()
 
 	// Send current peers list to newcomer
-	peersListMsg := struct {
-		Type  string `json:"type"`
-		Peers []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"peers"`
-	}{
-		Type:  "peers:list",
-		Peers: currentPeers,
+	peersListMsg := WebSocketMessage{
+		Type:  "room-users",
+		Users: currentPeers,
 	}
 	peersBytes, _ := json.Marshal(peersListMsg)
 	client.Conn.WriteMessage(websocket.TextMessage, peersBytes)
@@ -225,7 +231,8 @@ func (h *Hub) UnregisterClient(roomId string, userId string) {
 	if clientExists {
 		// Notify others
 		leaveNotify := WebSocketMessage{
-			Type:     "peer:left",
+			Type:     "peer-disconnected",
+			UserID:   userId,
 			SenderID: userId,
 		}
 		notifyBytes, _ := json.Marshal(leaveNotify)

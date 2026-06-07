@@ -46,3 +46,13 @@ Thumbs.db
 *.dylib
 vendor/
 dist/
+
+# Next.js / frontend
+.next/
+tsconfig.tsbuildinfo
+
+# Local tool caches
+.kiro/
+
+# Logs and runtime files
+*.log
