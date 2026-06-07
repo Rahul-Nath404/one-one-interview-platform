@@ -3,6 +3,7 @@
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
+import { AuthProvider } from '@/components/AuthProvider'
 import '../styles/globals.css'
 
 const queryClient = new QueryClient({
@@ -30,7 +31,9 @@ export default function RootLayout({
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <Toaster />
         </QueryClientProvider>
       </body>

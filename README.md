@@ -1,5 +1,118 @@
 # InterviewOS
 
+Lightweight interview platform (frontend: Next.js, backend: Go/Fiber).
+
+This repository contains the InterviewOS frontend and backend and a Docker Compose setup to run everything locally.
+
+**Contents**
+- `frontend/` — Next.js 14 (TypeScript) app
+- `backend/` — Go (Fiber) API server
+- `docker-compose.yml` — development compose stack
+
+## Prerequisites
+
+- Docker & Docker Compose (recommended)
+- Or: Go 1.21+, Node 18+, npm
+
+## Quick (recommended) — Run with Docker Compose
+
+1. Copy or set required environment variables (see `docker-compose.yml` and `backend/.env.example` if present).
+2. From repository root run:
+
+```bash
+docker-compose up --build
+```
+
+The frontend will be available at http://localhost:3000 and the backend at http://localhost:8080 (see compose file for ports).
+
+Stop the stack with:
+
+```bash
+docker-compose down
+```
+
+## Manual (no Docker)
+
+Backend (Go):
+
+1. Create a `.env` file in `backend/` with the required variables (example keys shown below).
+2. From `backend/`:
+
+```bash
+# install modules
+cd backend
+go mod download
+# run
+go run main.go
+```
+
+Frontend (Next.js):
+
+1. From `frontend/` install deps and start:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+2. Open http://localhost:3000
+
+## Environment variables (examples)
+
+Backend (`backend/.env`):
+
+```
+DATABASE_URL=postgres://user:pass@localhost:5432/interviewos
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=your_jwt_secret
+OPENAI_API_KEY=your_openai_key
+PORT=8080
+ENV=development
+```
+
+Frontend (`frontend/.env.local` or your environment):
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:8080
+NEXT_PUBLIC_WS_URL=ws://localhost:8080
+```
+
+## Database migrations
+
+Migrations are in `backend/migrations/`. Run your preferred migration tool or run the SQL files against your Postgres instance before starting the backend.
+
+## Cleaning before publishing
+
+This repo already includes a `.gitignore`. Remove local-only files (`node_modules`, build outputs, `.env`) before pushing to GitHub. Use the provided `.gitignore` patterns.
+
+## Troubleshooting
+
+- If ports are in use, change them in `docker-compose.yml`.
+- Check backend health: `http://localhost:8080/health`
+- Check Docker Compose logs:
+
+```bash
+docker-compose logs -f
+```
+
+## Contributing
+
+1. Fork the repo and create a branch for your feature.
+2. Open a pull request with a clear description and screenshots if applicable.
+
+## License
+
+See [LICENSE](LICENSE) for licensing information.
+
+---
+If you want, I can also:
+- add a `backend/.env.example` file,
+- update `frontend/README.md` with simplified start steps, or
+- commit and create a GitHub repo and push for you (you will need to provide the remote URL).
+
+# InterviewOS
+
 A browser-based interview platform enabling recruiters, interviewers, and candidates to conduct secure and collaborative interviews with scheduling, WebRTC video/audio communication, and real-time code collaboration.
 
 ## 🚀 Quick Start
@@ -488,4 +601,5 @@ For issues and questions, please open a GitHub issue or contact support@intervie
  
  #   i n t e r v i e w _ O S 
  
+ #   i n t e r v i e w _ h e l p  
  

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { apiClient } from '@/lib/api'
@@ -27,7 +26,6 @@ const getDisplayName = (email: string) => {
 }
 
 export default function InterviewsListPage() {
-	const router = useRouter()
 	const [interviews, setInterviews] = useState<Interview[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 	const [filter, setFilter] = useState<'all' | 'upcoming' | 'completed'>('all')
@@ -53,7 +51,6 @@ export default function InterviewsListPage() {
 		return true
 	})
 
-	return (
 	return (
 		<div className="min-h-screen bg-white text-black font-sans antialiased">
 			{/* Top Glass Header */}

@@ -49,7 +49,7 @@ export default function NewInterviewPage() {
 				throw new Error('Failed to create interview')
 			}
 
-			const interview = await response.json()
+			await response.json()
 			toast.success('Interview scheduled successfully')
 			router.push(`/dashboard`)
 		} catch (error) {

@@ -296,16 +296,4 @@ export default function DashboardPage() {
 			</main>
 		</div>
 	)
-												<ChevronRight size={13} className="text-slate-600 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
-											</div>
-										</Link>
-									)
-								})
-							)}
-						</CardContent>
-					</Card>
-				</div>
-			</main>
-		</div>
-	)
 }

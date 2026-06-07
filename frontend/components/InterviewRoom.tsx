@@ -41,14 +41,14 @@ const getDisplayName = (email: string) => {
 	return parts.charAt(0).toUpperCase() + parts.slice(1)
 }
 
-export function InterviewRoom({ roomId, interviewId }: { roomId: string; interviewId?: string }) {
+export function InterviewRoom({ roomId }: { roomId: string }) {
 	const { user } = useAuthStore()
 	const router = useRouter()
 
 	// Media streams and connection states
 	const [localStream, setLocalStream] = useState<MediaStream | null>(null)
 	const [remoteStreams, setRemoteStreams] = useState<Map<string, { stream: MediaStream; name: string }>>(new Map())
-	const [isConnected, setIsConnected] = useState(false)
+	const [, setIsConnected] = useState(false)
 
 	// Editor, language & runner states
 	const [code, setCode] = useState('// Type your solution here\n')
@@ -758,7 +758,7 @@ export function InterviewRoom({ roomId, interviewId }: { roomId: string; intervi
 									<div className="flex gap-2">
 										<Rating
 											value={rating}
-											onChange={(event, newValue) => {
+											onChange={(_, newValue) => {
 												if (newValue !== null) setRating(newValue)
 											}}
 											sx={{

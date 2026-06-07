@@ -9,5 +9,5 @@ export default function InterviewRoomPage({
 }) {
   const { id } = params
 
-  return <InterviewRoom roomId={id} interviewId={id} />
+  return <InterviewRoom roomId={id} />
 }
